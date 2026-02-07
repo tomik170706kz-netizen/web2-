@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>AnimeLib - Dev Test</title>
+    <style>
+        body { font-family: sans-serif; background: #121212; color: white; padding: 20px; }
+        .card { background: #1e1e1e; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #333; }
+        input { display: block; margin: 10px 0; padding: 8px; width: 250px; }
+        button { cursor: pointer; padding: 10px 20px; background: #6200ee; color: white; border: none; border-radius: 4px; }
+        pre { background: #000; padding: 10px; color: #0f0; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>🎬 AnimeLib Dev Test Page</h1>
+
+    <div class="card">
+        <h3>1. Login</h3>
+        <input type="email" id="loginEmail" placeholder="Email (e.g. test@test.com)">
+        <input type="password" id="loginPass" placeholder="Password">
+        <button onclick="login()">Login & Get Token</button>
+    </div>
+
+    <div class="card">
+        <h3>2. Protected Profile Data</h3>
+        <button onclick="getProfile()">Fetch My Profile</button>
+        <pre id="output">Results will appear here...</pre>
+    </div>
+
+    <script>
+        let userToken = "";
+
+        async function login() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPass').value;
+
+            const response = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+
+            const data = await response.json();
+            
+            if (response.ok) {
+                userToken = data.token;
+                alert("Login Successful! Token saved.");
+                console.log("Token:", userToken);
+            } else {
+                alert("Login Failed: " + data.message);
+            }
+        }
+
+        async function getProfile() {
+            if (!userToken) return alert("Please login first!");
+
+            const response = await fetch('/api/users/profile', {
+                method: 'GET',
+                headers: { 
+                    'Authorization': `Bearer ${userToken}` 
+                }
+            });
+
+            const data = await response.json();
+            document.getElementById('output').innerText = JSON.stringify(data, null, 2);
+        }
+    </script>
+</body>
+</html>
