@@ -1,0 +1,97 @@
+root {
+    --main-gradient: linear-gradient(90deg, #ff0050 0%, #ff9000 100%);
+    --bg-black: #0a0a0a;
+    --card-gray: #161616;
+}
+
+body {
+    background-color: var(--bg-black) !important;
+    color: #0a0a0a !important;
+    min-height: 100vh;
+}
+
+.card {
+    background-color: var(--card-gray) !important;
+    border: 2px solid #ff0050 !important;
+    color: #0a0a0a !important;
+}
+
+.form-control {
+    background-color: #222 !important;
+    border: 1px solid #444 !important;
+    color: white !important;
+}
+
+.form-control:focus {
+    background-color: #333 !important;
+    color: white !important;
+    border-color: #ff0050 !important;
+    box-shadow: 0 0 10px rgba(255, 144, 0, 0.5) !important;
+}
+
+.navbar {
+    background-color: #000 !important;
+    border-bottom: 2px solid #ff0050;
+}
+
+.nav-link, .navbar-brand {
+    color: white !important;
+}
+
+.btn-primary {
+    background: var(--main-gradient) !important;
+    border: none !important;
+    font-weight: bold !important;
+}
+
+.text-gradient {
+    background: var(--main-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: bold;
+}
+
+.toggle-link {
+    color: #ff2407 !important; 
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.hidden { display: none !important; }
+html, body {
+    background-color: #000000 !important; 
+    background: #000000 !important;
+    color: #ffffff !important;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+}
+
+.container-fluid, .container {
+    background-color: transparent !important;
+}
+
+.card {
+    background-color: #111111 !important; /* Очень темно-серый */
+    border: 2px solid #ff0050 !important; /* Розовая рамка из твоего дизайна */
+    border-radius: 20px !important;
+    color: white !important;
+}
+
+.form-control {
+    background-color: #222 !important;
+    border: 1px solid #444 !important;
+    color: white !important;
+}
+
+.text-gradient {
+    background: linear-gradient(90deg, #ff0050 0%, #ff9000 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: bold;
+}
+
+.btn-primary {
+    background: linear-gradient(90deg, #ff0050 0%, #ff9000 100%) !important;
+    border: none !important;
+}
