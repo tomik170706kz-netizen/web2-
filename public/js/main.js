@@ -1,124 +1,147 @@
 document.addEventListener('DOMContentLoaded', () => {
     const token = localStorage.getItem('userToken');
     const username = localStorage.getItem('userName');
+    
+    const path = window.location.pathname;
+    const isAuthPage = path.includes('index.html') || path === '/';
+    const isListPage = path.includes('anime_list.html');
+    const isProfilePage = path.includes('profile.html');
+    const isDetailsPage = path.includes('details.html');
 
-    // --- GLOBAL LOGIC: NAVBAR & LOGOUT ---
+    // Навигация
     const navUser = document.getElementById('nav-username');
     if (navUser && username) navUser.innerText = username;
 
-    const logoutBtn = document.getElementById('logout-btn');
-    logoutBtn?.addEventListener('click', () => {
+    document.getElementById('logout-btn')?.addEventListener('click', () => {
         localStorage.clear();
         window.location.href = 'index.html';
     });
 
-    // --- PAGE 1: AUTHENTICATION (index.html) ---
-    const regForm = document.getElementById('registerForm');
-    const logForm = document.getElementById('loginForm');
-    
-    if (regForm || logForm) {
-        if (token) window.location.href = 'anime_list.html'; // Redirect if already logged in
-
-        // Toggle logic
-        document.getElementById('show-login')?.addEventListener('click', () => {
-            document.getElementById('register-section').classList.add('hidden');
-            document.getElementById('login-section').classList.remove('hidden');
-        });
-
-        document.getElementById('show-register')?.addEventListener('click', () => {
-            document.getElementById('login-section').classList.add('hidden');
-            document.getElementById('register-section').classList.remove('hidden');
-        });
-
-        // Register Action
-        regForm?.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const userData = {
-                username: document.getElementById('reg-user').value,
-                email: document.getElementById('reg-email').value,
-                password: document.getElementById('reg-pass').value
-            };
-            handleAuth('/api/auth/register', userData);
-        });
-
-        // Login Action
-        logForm?.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const userData = {
-                email: document.getElementById('log-email').value,
-                password: document.getElementById('log-pass').value
-            };
-            handleAuth('/api/auth/login', userData);
-        });
+    // Редиректы
+    if (!token && !isAuthPage) {
+        window.location.href = 'index.html';
+        return;
     }
-// --- PAGE 2: ANIME LIST (anime_list.html) ---
-const addAnimeForm = document.getElementById('addAnimeForm');
 
-if (addAnimeForm) {
-    if (!token) window.location.href = 'index.html';
-    
-   
-    loadAnimeList(); 
+    // --- 1. СТРАНИЦА СПИСКА (ANIME_LIST) ---
+    if (isListPage) {
+        loadAnimeList(); // Загружаем при входе
 
-    addAnimeForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        
-        const titleInput = document.getElementById('animeTitle');
-        const title = titleInput.value.trim();
+        document.getElementById('addAnimeForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const titleInput = document.getElementById('animeTitle');
+            const title = titleInput.value;
 
-        if (!title) return alert("Please enter a title");
-
-        try {
-            const res = await fetch('http://localhost:5000/api/resource', { 
+            const res = await fetch('/api/anime', {
                 method: 'POST',
                 headers: { 
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'application/json', 
                     'Authorization': `Bearer ${token}` 
                 },
-                body: JSON.stringify({ title: title })
+                body: JSON.stringify({ title })
             });
 
             if (res.ok) {
-                titleInput.value = ''; 
-                loadAnimeList(); 
-            } else {
-                const errorData = await res.json();
-                alert(`Error: ${errorData.message || "Could not add anime"}`);
+                titleInput.value = ''; // Чистим поле
+                loadAnimeList(); // ВОТ ЭТО ИСПРАВЛЕНО: обновляем список сразу
             }
-        } catch (err) {
-            console.error("Network error:", err);
-            alert("Server is not responding. Check if backend is running on port 5000.");
-        }
-    });
-}
-    // --- PAGE 3: PROFILE (profile.html) ---
-    const profileForm = document.getElementById('profileForm');
-    if (profileForm) {
-        if (!token) window.location.href = 'index.html';
-        loadProfileData();
+        });
+    }
 
-        profileForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const updatedData = {
-                username: document.getElementById('prof-username').value,
-                email: document.getElementById('prof-email').value
-            };
-            const res = await fetch('/api/users/profile', {
+    // --- 2. СТРАНИЦА ДЕТАЛЕЙ ---
+    if (isDetailsPage) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const animeId = urlParams.get('id');
+
+        const loadDetails = async () => {
+            const res = await fetch(`/api/anime/${animeId}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const item = await res.json();
+            if (res.ok) {
+                document.getElementById('detail-title').innerText = item.title;
+                document.getElementById('detail-status').value = item.status;
+            }
+        };
+        loadDetails();
+
+        document.getElementById('update-item-btn')?.addEventListener('click', async () => {
+            const res = await fetch(`/api/anime/${animeId}`, {
                 method: 'PUT',
                 headers: { 
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}` 
                 },
-                body: JSON.stringify(updatedData)
+                body: JSON.stringify({ 
+                    title: document.getElementById('detail-title').innerText, 
+                    status: document.getElementById('detail-status').value 
+                })
             });
             if (res.ok) {
-                localStorage.setItem('userName', updatedData.username);
-                alert('Profile Updated!');
+                alert('Saved! ✅');
+                window.location.href = 'anime_list.html';
             }
+        });
+
+        document.getElementById('delete-item-btn')?.addEventListener('click', async () => {
+            if (!confirm('Delete?')) return;
+            const res = await fetch(`/api/anime/${animeId}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (res.ok) window.location.href = 'anime_list.html';
         });
     }
 
-    // --- HELPER FUNCTIONS ---
+    // --- 3. АВТОРИЗАЦИЯ ---
+    if (isAuthPage) {
+        if (token) window.location.href = 'anime_list.html';
+
+        document.querySelector('.text-center a, #show-login')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            const isLoginClick = e.target.innerText.toLowerCase().includes('login');
+            document.getElementById('register-section').classList.toggle('hidden', isLoginClick);
+            document.getElementById('login-section').classList.toggle('hidden', !isLoginClick);
+        });
+
+        document.getElementById('registerForm')?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            handleAuth('/api/auth/register', {
+                username: document.getElementById('reg-user').value,
+                email: document.getElementById('reg-email').value,
+                password: document.getElementById('reg-pass').value
+            });
+        });
+
+        document.getElementById('loginForm')?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            handleAuth('/api/auth/login', {
+                email: document.getElementById('log-email').value,
+                password: document.getElementById('log-pass').value
+            });
+        });
+    }
+
+    // --- ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ---
+    async function loadAnimeList() {
+        const res = await fetch('/api/anime', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        const container = document.getElementById('anime-list-container');
+        if (container && Array.isArray(data)) {
+            container.innerHTML = data.map(item => `
+                <div class="col-md-4 mb-3">
+                    <div class="card p-3 bg-dark text-white border-danger">
+                        <h5>${item.title}</h5>
+                        <p class="badge bg-primary">${item.status}</p>
+                        <a href="details.html?id=${item._id}" class="btn btn-sm btn-outline-light">Details</a>
+                    </div>
+                </div>
+            `).join('');
+        }
+    }
+
     async function handleAuth(url, body) {
         const res = await fetch(url, {
             method: 'POST',
@@ -130,31 +153,6 @@ if (addAnimeForm) {
             localStorage.setItem('userToken', data.token);
             localStorage.setItem('userName', data.username);
             window.location.href = 'anime_list.html';
-        } else {
-            alert(data.message || 'Auth Failed');
-        }
+        } else alert(data.message);
     }
-async function loadAnimeList() {
-    const res = await fetch('http://localhost:5000/api/resource', {
-        headers: { 'Authorization': `Bearer ${token}` }
-    });
-    const data = await res.json();
-    const container = document.getElementById('anime-list-container');
-    
-    if (container) {
-        container.innerHTML = data.map(item => `
-            <div class="col-12 col-md-6 col-lg-4">
-                <div class="card h-100 p-3 shadow-sm">
-                    <div class="card-body d-flex flex-column">
-                        <h5 class="card-title fw-bold text-gradient">${item.title}</h5>
-                        <p class="text-muted small">Status: ${item.status || 'Planned'}</p>
-                        <div class="mt-auto">
-                            <a href="details.html?id=${item._id}" class="btn btn-sm btn-outline-light w-100">Edit Details</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `).join('');
-    }
-}
 });

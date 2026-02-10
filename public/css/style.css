@@ -1,97 +1,190 @@
-root {
+
+:root {
     --main-gradient: linear-gradient(90deg, #ff0050 0%, #ff9000 100%);
-    --bg-black: #0a0a0a;
-    --card-gray: #161616;
+    --bg-black: #000000;
+    --card-gray: #111111;
 }
 
 body {
     background-color: var(--bg-black) !important;
-    color: #0a0a0a !important;
+    color: #ffffff !important;
+    font-family: 'Segoe UI', sans-serif;
+    margin: 0;
     min-height: 100vh;
+}
+
+.container.mt-5 {
+    display: block !important; 
 }
 
 .card {
     background-color: var(--card-gray) !important;
     border: 2px solid #ff0050 !important;
-    color: #0a0a0a !important;
-}
-
-.form-control {
-    background-color: #222 !important;
-    border: 1px solid #444 !important;
+    border-radius: 20px !important;
     color: white !important;
+    margin-bottom: 20px;
 }
 
-.form-control:focus {
-    background-color: #333 !important;
-    color: white !important;
-    border-color: #ff0050 !important;
-    box-shadow: 0 0 10px rgba(255, 144, 0, 0.5) !important;
+
+.details-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh;
 }
 
-.navbar {
-    background-color: #000 !important;
-    border-bottom: 2px solid #ff0050;
+.details-card {
+    width: 100% !important;
+    max-width: 700px !important;
+    padding: 50px !important;   
+    text-align: center;
 }
 
-.nav-link, .navbar-brand {
-    color: white !important;
-}
-
-.btn-primary {
-    background: var(--main-gradient) !important;
-    border: none !important;
-    font-weight: bold !important;
-}
-
-.text-gradient {
+#detail-title {
     background: var(--main-gradient);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    font-weight: bold;
+    font-size: 3.5rem !important;
+    font-weight: 900;
+    text-transform: uppercase;
+    margin-bottom: 30px;
 }
 
-.toggle-link {
-    color: #ff2407 !important; 
-    cursor: pointer;
-    text-decoration: underline;
-}
-
-.hidden { display: none !important; }
-html, body {
-    background-color: #000000 !important; 
-    background: #000000 !important;
-    color: #ffffff !important;
-    margin: 0;
-    padding: 0;
-    min-height: 100vh;
-}
-
-.container-fluid, .container {
-    background-color: transparent !important;
-}
-
-.card {
-    background-color: #111111 !important; /* Очень темно-серый */
-    border: 2px solid #ff0050 !important; /* Розовая рамка из твоего дизайна */
-    border-radius: 20px !important;
-    color: white !important;
-}
-
-.form-control {
+.form-control, select {
     background-color: #222 !important;
     border: 1px solid #444 !important;
     color: white !important;
+    padding: 12px !important;
 }
 
-.text-gradient {
+.btn-primary, #update-item-btn {
+    background: var(--main-gradient) !important;
+    border: none !important;
+    padding: 12px 30px !important;
+    font-weight: bold;
+    border-radius: 10px;
+}
+
+.btn-danger, #delete-item-btn {
+    background: #ff0050 !important;
+    border: none !important;
+    padding: 12px 30px !important;
+}
+
+.d-flex.gap-2 {
+    justify-content: center !important;
+    gap: 20px !important;
+    margin-top: 20px;
+}
+
+a.text-muted {
+    color: #ff9000 !important;
+    font-weight: bold;
+    text-decoration: none;
+    font-size: 1.1rem;
+}
+/* Специальный контейнер для центрирования деталей */
+.details-page-wrapper {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #000;
+    padding: 20px;
+}
+
+/* Сама карточка: стала шире и выше */
+.details-card {
+    background-color: #111111 !important;
+    border: 2px solid #ff0050 !important;
+    border-radius: 30px !important;
+    padding: 60px 40px !important; /* Большие отступы внутри */
+    max-width: 800px !important;    /* Увеличили ширину */
+    width: 100%;
+    text-align: center;
+}
+
+/* Огромный заголовок */
+#detail-title {
     background: linear-gradient(90deg, #ff0050 0%, #ff9000 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    font-weight: bold;
+    font-size: 4rem !important; /* Масштабно */
+    font-weight: 900;
+    margin-bottom: 10px;
+    letter-spacing: -1px;
 }
 
-.btn-primary {
+.divider {
+    height: 2px;
+    background: rgba(255, 255, 255, 0.1);
+    margin: 30px auto;
+    width: 60%;
+}
+
+.status-label {
+    color: #ff9000;
+    font-weight: bold;
+    letter-spacing: 2px;
+    display: block;
+    margin-bottom: 15px;
+}
+
+/* Стилизация Select */
+.status-select {
+    background-color: #222 !important;
+    border: 1px solid #444 !important;
+    color: white !important;
+    font-size: 1.2rem !important;
+    padding: 15px !important;
+    border-radius: 12px !important;
+    text-align: center;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+/* Кнопки в стиле Cyberpunk */
+.action-buttons {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin-top: 40px;
+}
+
+.btn-save {
     background: linear-gradient(90deg, #ff0050 0%, #ff9000 100%) !important;
-    border: none !important;
+    border: none;
+    color: white;
+    font-weight: 800;
+    padding: 15px 40px;
+    border-radius: 12px;
+    flex-grow: 1;
+    max-width: 300px;
+}
+
+.btn-delete {
+    background: transparent !important;
+    border: 2px solid #ff0050 !important;
+    color: #ff0050 !important;
+    font-weight: 800;
+    padding: 15px 30px;
+    border-radius: 12px;
+}
+
+.btn-delete:hover {
+    background: #ff0050 !important;
+    color: white !important;
+}
+
+.back-link {
+    color: #666 !important;
+    text-decoration: none;
+    font-weight: bold;
+    display: inline-block;
+    margin-top: 40px;
+    transition: 0.3s;
+}
+
+.back-link:hover {
+    color: #ff9000 !important;
 }
