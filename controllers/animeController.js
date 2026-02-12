@@ -23,6 +23,50 @@ const animeValidationSchema = Joi.object({
     imageUrl: Joi.string().allow('', null)
 });
 
+const reviewSchema = Joi.object({
+  rating: Joi.number().min(1).max(10).required(),
+  comment: Joi.string().allow('', null)
+});
+
+// Public listing with optional category filter
+exports.getPublicList = async (req, res) => {
+  try {
+    const { category, q } = req.query;
+    const filter = {};
+    if (category) filter.categories = category;
+    if (q) filter.title = { $regex: q, $options: 'i' };
+
+    const list = await Anime.find(filter).select('title status rating categories');
+    res.json(list);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Public details (read-only), includes reviews
+exports.getAnimePublicById = async (req, res) => {
+  try {
+    const anime = await Anime.findById(req.params.id).populate('reviews.user', 'username');
+    if (!anime) return res.status(404).json({ message: 'Anime not found' });
+
+    // compute average rating from reviews if present
+    const avgRating = anime.reviews && anime.reviews.length
+      ? (anime.reviews.reduce((s, r) => s + r.rating, 0) / anime.reviews.length)
+      : anime.rating || null;
+
+    res.json({
+      _id: anime._id,
+      title: anime.title,
+      status: anime.status,
+      rating: avgRating,
+      categories: anime.categories,
+      reviews: anime.reviews
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 exports.addAnime = async (req, res) => {
   try {
     const { error } = animeValidationSchema.validate(req.body);
@@ -109,6 +153,29 @@ exports.deleteAnime = async (req, res) => {
 
 await Anime.deleteOne({ _id: req.params.id });
     res.json({ message: 'Anime removed' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Add a review (authenticated)
+exports.addReview = async (req, res) => {
+  try {
+    const { error } = reviewSchema.validate(req.body);
+    if (error) return res.status(400).json({ message: error.details[0].message });
+
+    const anime = await Anime.findById(req.params.id);
+    if (!anime) return res.status(404).json({ message: 'Anime not found' });
+
+    // prevent multiple reviews by same user
+    const already = anime.reviews.find(r => r.user.toString() === req.user._id.toString());
+    if (already) return res.status(400).json({ message: 'You have already reviewed this anime' });
+
+    const review = { user: req.user._id, rating: req.body.rating, comment: req.body.comment };
+    anime.reviews.push(review);
+    await anime.save();
+
+    res.status(201).json({ message: 'Review added' });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

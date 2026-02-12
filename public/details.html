@@ -40,6 +40,26 @@
                         <span class="arrow">←</span> BACK TO LIBRARY
                     </a>
                 </div>
+
+                <div class="divider"></div>
+                <div id="reviews-section" class="text-start mt-4">
+                    <h4>Reviews</h4>
+                    <div id="avg-rating" class="mb-2 text-warning"></div>
+                    <div id="reviews-list"></div>
+
+                    <div id="add-review" class="mt-4">
+                        <h5>Add your review</h5>
+                        <div class="mb-2">
+                            <label class="form-label">Rating (1-10)</label>
+                            <input id="review-rating" type="number" min="1" max="10" class="form-control" />
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">Comment</label>
+                            <textarea id="review-comment" class="form-control" rows="3"></textarea>
+                        </div>
+                        <button id="submit-review" class="btn btn-primary">Submit Review</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
